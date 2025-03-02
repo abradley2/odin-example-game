@@ -18,6 +18,9 @@ free_pool :: proc(pool: ^Pool) {
 	for sprite_vector in pool.sprite_vectors {
 		delete_dynamic_array(sprite_vector)
 	}
+	for animation_frame in pool.animation_frames {
+		delete_dynamic_array(animation_frame)
+	}
 	free(pool)
 }
 

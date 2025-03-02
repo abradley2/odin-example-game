@@ -18,6 +18,16 @@ check_spawn :: proc(
 		case tiled.Player_Spawn:
 			player_entity_ref := entity.alloc_entity(entity_pool, true)
 
+			animation_frames := entity.alloc_animation_frames(
+				entity_pool,
+				player_entity_ref.local_id,
+			)
+
+			w.animation_frames[player_entity_ref.local_id] = component.make_animation(
+				component.Animation_Id.Player_Walk,
+				animation_frames,
+			)
+
 			w.is_player[player_entity_ref.local_id] = component.Is_Player{}
 
 			w.position[player_entity_ref.local_id] = position + raylib.Vector2{0, -16}

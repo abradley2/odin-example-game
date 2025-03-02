@@ -98,7 +98,6 @@ set_current_map_id: tiled.Map_Id = tiled.Map_Id.Level01
 scene_state: scene.Scene_State = nil
 
 update :: proc() {
-
 	scene.run_scene_state(&scene_state, &w, entity_pool, set_current_map_id)
 
 	parallax_camera := raylib.Camera2D {
@@ -146,6 +145,7 @@ update :: proc() {
 		w.collision_box[:],
 	)
 	system.run_player_controls_system(controls, w.velocity[:], w.is_player[:], w.collision_box[:])
+	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
 	system.run_velocity_system(delta, w.velocity[:], w.position[:])
 
 	raylib.BeginDrawing()
