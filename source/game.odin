@@ -4,7 +4,6 @@ import "./entity"
 
 import "./component"
 import "./controls"
-import "./platform"
 import "./quadtree"
 import "./scene"
 import "./system"
@@ -21,6 +20,9 @@ w: #soa[entity.POOL_SIZE]entity.Entity
 tile_map_packed_texture: raylib.Texture
 tile_map_backgrounds_packed_texture: raylib.Texture
 characters_packed_texture: raylib.Texture
+
+ui_button_blue_texture: raylib.Texture
+ui_arrow_basic_blue_texture: raylib.Texture
 
 game_width :: f32(320.0)
 
@@ -43,53 +45,14 @@ init :: proc() {
 	screen_height = f32(raylib.GetScreenHeight())
 
 	// Load textures
-	if tile_map_packed_data, tile_map_packed_ok := platform.read_entire_file(
-		texture.texture_id_to_path_string(texture.Texture_Id.Tile_Map_Packed),
-		context.temp_allocator,
-	); tile_map_packed_ok {
-		tile_map_packed_img := raylib.LoadImageFromMemory(
-			".png",
-			raw_data(tile_map_packed_data),
-			c.int(len(tile_map_packed_data)),
-		)
-		tile_map_packed_texture = raylib.LoadTextureFromImage(tile_map_packed_img)
-		raylib.UnloadImage(tile_map_packed_img)
-	} else {
-		panic("Failed to load tilemap packed texture")
-	}
-
-	if tile_map_backgrounds_packed_data, tile_map_backgrounds_packed_ok :=
-		platform.read_entire_file(
-			texture.texture_id_to_path_string(texture.Texture_Id.Tile_Map_Backgrounds_Packed),
-			context.temp_allocator,
-		); tile_map_backgrounds_packed_ok {
-		tile_map_backgrounds_packed_img := raylib.LoadImageFromMemory(
-			".png",
-			raw_data(tile_map_backgrounds_packed_data),
-			c.int(len(tile_map_backgrounds_packed_data)),
-		)
-		tile_map_backgrounds_packed_texture = raylib.LoadTextureFromImage(
-			tile_map_backgrounds_packed_img,
-		)
-		raylib.UnloadImage(tile_map_backgrounds_packed_img)
-	} else {
-		panic("Failed to load tilemap backgrounds packed texture")
-	}
-
-	if characters_packed_data, characters_packed_ok := platform.read_entire_file(
-		texture.texture_id_to_path_string(texture.Texture_Id.Characters_Packed),
-		context.temp_allocator,
-	); characters_packed_ok {
-		characters_packed_img := raylib.LoadImageFromMemory(
-			".png",
-			raw_data(characters_packed_data),
-			c.int(len(characters_packed_data)),
-		)
-		characters_packed_texture = raylib.LoadTextureFromImage(characters_packed_img)
-		raylib.UnloadImage(characters_packed_img)
-	} else {
-		panic("Failed to load characters packed texture")
-	}
+	texture.load(texture.Texture_Id.UI_Button_Blue, &ui_button_blue_texture)
+	texture.load(texture.Texture_Id.UI_Arrow_Basic_Blue, &ui_arrow_basic_blue_texture)
+	texture.load(texture.Texture_Id.Tile_Map_Packed, &tile_map_packed_texture)
+	texture.load(
+		texture.Texture_Id.Tile_Map_Backgrounds_Packed,
+		&tile_map_backgrounds_packed_texture,
+	)
+	texture.load(texture.Texture_Id.Characters_Packed, &characters_packed_texture)
 }
 
 
@@ -219,6 +182,10 @@ render_sprite :: proc(position: raylib.Vector2, sprite: component.Sprite) -> (di
 		found_texture = tile_map_backgrounds_packed_texture
 	case texture.Texture_Id.Characters_Packed:
 		found_texture = characters_packed_texture
+	case texture.Texture_Id.UI_Button_Blue:
+		found_texture = ui_button_blue_texture
+	case texture.Texture_Id.UI_Arrow_Basic_Blue:
+		found_texture = ui_arrow_basic_blue_texture
 	case texture.Texture_Id.Missing:
 		found_texture = nil
 	}

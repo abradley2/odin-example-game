@@ -75,8 +75,6 @@ run_static_collisions_system :: proc(
 					velocity[0] = 0
 					continue
 				}
-
-
 			}
 		}
 
