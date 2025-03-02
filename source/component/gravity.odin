@@ -1,0 +1,3 @@
+package component
+
+Gravity :: struct {}
