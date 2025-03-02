@@ -9,4 +9,5 @@ Sprite :: struct {
 	dst_offset: raylib.Vector2,
 	dst_width:  f32,
 	dst_height: f32,
+	flipped:    bool,
 }

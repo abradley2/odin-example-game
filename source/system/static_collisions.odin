@@ -65,7 +65,6 @@ run_static_collisions_system :: proc(
 					collision_box.did_touch = collision_box.did_touch | {.Wall}
 					position[0] = box.position.x + box.w
 				}
-
 			}
 		}
 

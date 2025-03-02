@@ -114,9 +114,9 @@ update :: proc() {
 		zoom     = 1,
 	}
 
-	paralax_camera_target += raylib.Vector2{0.5, 0.0}
-	paralax_camera_target[1] = 32
-	camera_target += raylib.Vector2{1.0, 0.0}
+	// paralax_camera_target += raylib.Vector2{0.5, 0.0}
+	// paralax_camera_target[1] = 32
+	// camera_target += raylib.Vector2{1.0, 0.0}
 
 	if raylib.IsWindowResized() {
 		screen_width = f32(raylib.GetScreenWidth())
@@ -144,7 +144,13 @@ update :: proc() {
 		w.velocity[:],
 		w.collision_box[:],
 	)
-	system.run_player_controls_system(controls, w.velocity[:], w.is_player[:], w.collision_box[:])
+	system.run_player_controls_system(
+		controls,
+		w.sprite[:],
+		w.velocity[:],
+		w.is_player[:],
+		w.collision_box[:],
+	)
 	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
 	system.run_velocity_system(delta, w.velocity[:], w.position[:])
 
@@ -224,7 +230,18 @@ render_sprite :: proc(position: raylib.Vector2, sprite: component.Sprite) -> (di
 		height = sprite.dst_height,
 	}
 
-	raylib.DrawTexturePro(texture, sprite.src_rect, dst_rect, {0, 0}, 0, raylib.WHITE)
+	src_rect := raylib.Rectangle {
+		x      = sprite.src_rect.x,
+		y      = sprite.src_rect.y,
+		width  = sprite.src_rect.width,
+		height = sprite.src_rect.height,
+	}
+
+	if sprite.flipped {
+		src_rect.width *= -1
+	}
+
+	raylib.DrawTexturePro(texture, src_rect, dst_rect, {0, 0}, 0, raylib.WHITE)
 	did_render = true
 	return
 }

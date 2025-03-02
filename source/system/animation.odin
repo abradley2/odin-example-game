@@ -1,7 +1,6 @@
 package system
 
 import "../component"
-import "core:log"
 
 run_animation_system :: proc(
 	dt: f32,
