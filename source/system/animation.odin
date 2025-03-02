@@ -1,6 +1,7 @@
 package system
 
 import "../component"
+import "core:log"
 
 run_animation_system :: proc(
 	dt: f32,
@@ -22,6 +23,8 @@ run_animation_system :: proc(
 			next_frame := animation_frames.frames[next_frame_idx]
 			sprite.texture_id = next_frame.texture_id
 			sprite.src_rect = next_frame.src_rect
+			animation_frames.current_frame_idx = next_frame_idx
+			animation_frames.current_duration = 0
 		}
 	}
 }
