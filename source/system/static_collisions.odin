@@ -49,8 +49,11 @@ run_static_collisions_system :: proc(
 
 
 				if is_ground_collision {
-					collision_box.did_touch = collision_box.did_touch | {.Floor}
-					position[1] = box.position.y - collision_box.size.y
+					if velocity.y > 0 {
+						position[1] = box.position.y - collision_box.size.y
+						collision_box.did_touch = collision_box.did_touch | {.Floor}
+
+					}
 					velocity[1] = 0
 				}
 
