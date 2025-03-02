@@ -6,11 +6,12 @@ POOL_SIZE :: 4_096
 
 // GUIDE: when a component needs an allocated resources, add it here. See sprite vectors example
 Pool :: struct {
-	current_gid:    u64,
-	available:      [POOL_SIZE]bool,
-	lid_to_gid:     [POOL_SIZE]u64,
-	renderables:    [POOL_SIZE]int,
-	sprite_vectors: [POOL_SIZE][dynamic]component.Sprite,
+	current_gid:      u64,
+	available:        [POOL_SIZE]bool,
+	lid_to_gid:       [POOL_SIZE]u64,
+	renderables:      [POOL_SIZE]int,
+	sprite_vectors:   [POOL_SIZE][dynamic]component.Sprite,
+	animation_frames: [POOL_SIZE][dynamic]component.Animation_Frame,
 }
 
 free_pool :: proc(pool: ^Pool) {
@@ -25,10 +26,19 @@ new_pool :: proc(allocator := context.allocator) -> ^Pool {
 
 	for i in 0 ..< POOL_SIZE {
 		pool.sprite_vectors[i] = make([dynamic]component.Sprite, allocator)
+		pool.animation_frames[i] = make([dynamic]component.Animation_Frame, allocator)
 		pool.available[i] = true
 	}
 
 	return pool
+}
+
+alloc_animation_frames :: proc(pool: ^Pool, local_id: int) -> ^[dynamic]component.Animation_Frame {
+	return &pool.animation_frames[local_id]
+}
+
+free_animation_frames :: proc(pool: ^Pool, local_id: int) {
+	resize(&pool.animation_frames[local_id], 0)
 }
 
 alloc_sprite_vector :: proc(pool: ^Pool, local_id: int) -> ^[dynamic]component.Sprite {
@@ -43,6 +53,7 @@ free_entity :: proc(pool: ^Pool, local_id: int) {
 	pool.available[local_id] = true
 
 	free_sprite_vector(pool, local_id)
+	free_animation_frames(pool, local_id)
 
 	for i in 0 ..< len(pool.renderables) {
 		if pool.renderables[i] == local_id {
