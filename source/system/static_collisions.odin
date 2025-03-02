@@ -13,13 +13,15 @@ run_static_collisions_system :: proc(
 	nearby_boxes, _ := make([dynamic]quadtree.Box, 0, 64, context.temp_allocator)
 
 	for i in 0 ..< len(position_components) {
-		position := (&position_components[i].?) or_continue
+		_position := (&position_components[i].?) or_continue
 		velocity := (&velocity_components[i].?) or_continue
 		collision_box := (&collision_box_components[i].?) or_continue
 
-		next_position := position^ + (velocity^ * dt)
+		position := _position^ + collision_box.offset
+
+		next_position := position + (velocity^ * dt)
 		next_collision_box := quadtree.Box {
-			position = next_position,
+			position = next_position + collision_box.offset,
 			w        = collision_box.size.x,
 			h        = collision_box.size.y,
 		}
