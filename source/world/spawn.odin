@@ -36,8 +36,8 @@ check_spawn :: proc(
 
 			w.velocity[player_entity_ref.local_id] = raylib.Vector2{0, 0}
 			w.collision_box[player_entity_ref.local_id] = component.Collision_Box {
-				offset = raylib.Vector2{4, 4},
-				size   = raylib.Vector2{16, 20},
+				offset = raylib.Vector2{6, 4},
+				size   = raylib.Vector2{12, 20},
 			}
 			w.sprite[player_entity_ref.local_id] = component.Sprite {
 				texture_id = texture.Texture_Id.Characters_Packed,

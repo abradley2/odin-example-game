@@ -49,7 +49,6 @@ run_static_collisions_system :: proc(
 					box.position.y < position.y + collision_box.size.y &&
 					box.position.y + box.h > position.y
 
-
 				if is_ground_collision {
 					if velocity.y > 0 {
 						position[1] = box.position.y - collision_box.size.y
