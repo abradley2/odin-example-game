@@ -144,6 +144,7 @@ update :: proc() {
 		w.velocity[:],
 		w.collision_box[:],
 	)
+	system.run_velocity_system(delta, w.velocity[:], w.position[:])
 	system.run_player_controls_system(
 		controls,
 		w.sprite[:],
@@ -152,7 +153,7 @@ update :: proc() {
 		w.collision_box[:],
 	)
 	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
-	system.run_velocity_system(delta, w.velocity[:], w.position[:])
+
 
 	raylib.BeginDrawing()
 	raylib.ClearBackground({194, 227, 232, 255})

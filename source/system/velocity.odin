@@ -8,10 +8,10 @@ run_velocity_system :: proc(
 	position_components: []Maybe(component.Position),
 ) {
 	for &has_velocity, i in velocity_components {
-		has_velocity := (&has_velocity.?) or_continue
+		velocity := (&has_velocity.?) or_continue
 		position := (&position_components[i].?) or_continue
 
-		position.x += has_velocity.x * dt
-		position.y += has_velocity.y * dt
+		position.x += velocity.x * dt
+		position.y += velocity.y * dt
 	}
 }

@@ -20,7 +20,7 @@ run_player_controls_system :: proc(
 		}
 
 		player_speed: f32
-		player_speed = 2.0
+		player_speed = 1.0
 
 		player_jump_speed: f32
 		player_jump_speed = -4.0
