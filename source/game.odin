@@ -137,7 +137,7 @@ update :: proc() {
 			raylib.DrawTexturePro(
 				tile_map_backgrounds_packed_texture,
 				raylib.Rectangle{0, 0, 96, 72},
-				raylib.Rectangle{bg_width * bg_idx, 0, bg_width, bg_height},
+				raylib.Rectangle{bg_width * bg_idx, -64, bg_width, bg_height},
 				{0.0, 0.0},
 				0.0,
 				raylib.WHITE,
