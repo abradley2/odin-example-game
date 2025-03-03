@@ -20,10 +20,10 @@ run_player_controls_system :: proc(
 		}
 
 		player_speed: f32
-		player_speed = 1.0
+		player_speed = 1.5
 
 		player_jump_speed: f32
-		player_jump_speed = -4.0
+		player_jump_speed = -3.5
 
 		velocity.x = game_controls.left_right_axis * player_speed
 

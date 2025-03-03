@@ -16,7 +16,10 @@ run_camera_follow_system :: proc(
 
 		position := (&position_components[entity_id].?) or_continue
 
-		camera.target = raylib.Vector2{position.x, position.y}
+		camera.target = raylib.Vector2 {
+			position.x - 240 + 32,
+			position.y - f32(raylib.GetScreenHeight()) / camera.zoom / 2,
+		}
 
 		break
 	}

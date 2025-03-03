@@ -10,6 +10,7 @@ import "./system"
 import "./texture"
 import "./tiled"
 import "core:c"
+import "core:log"
 import "vendor:raylib"
 
 run: bool
@@ -24,7 +25,7 @@ characters_packed_texture: raylib.Texture
 ui_button_blue_texture: raylib.Texture
 ui_arrow_basic_blue_texture: raylib.Texture
 
-game_width :: f32(320.0)
+game_width :: f32(480.0)
 
 screen_width: f32
 screen_height: f32
@@ -90,6 +91,7 @@ update :: proc() {
 	zoom := screen_width / game_width
 	camera.zoom = zoom
 	parallax_camera.zoom = zoom
+	log.infof("zoom: %d", zoom)
 
 	loaded_scene, scene_is_loaded := scene_state.(scene.Scene_Loaded)
 	if !scene_is_loaded {
