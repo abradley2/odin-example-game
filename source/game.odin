@@ -116,6 +116,7 @@ update :: proc() {
 		w.collision_box[:],
 	)
 	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
+	system.run_camera_follow_system(&camera, &parallax_camera, w.is_player[:], w.position[:])
 
 
 	raylib.BeginDrawing()
