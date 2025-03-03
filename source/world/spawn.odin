@@ -31,6 +31,7 @@ check_spawn :: proc(
 			w.is_player[player_entity_ref.local_id] = component.Is_Player{}
 
 			w.position[player_entity_ref.local_id] = position + raylib.Vector2{0, -16}
+			w.respawn[player_entity_ref.local_id] = position + raylib.Vector2{0, -16}
 
 			w.gravity[player_entity_ref.local_id] = component.Gravity{}
 

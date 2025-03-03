@@ -119,6 +119,7 @@ update :: proc() {
 	)
 	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
 	system.run_camera_follow_system(&camera, &parallax_camera, w.is_player[:], w.position[:])
+	system.run_respawn_system(w.respawn[:], w.position[:])
 
 
 	raylib.BeginDrawing()
@@ -233,7 +234,6 @@ shutdown :: proc() {
 
 should_run :: proc() -> bool {
 	when ODIN_OS != .JS {
-		// Never run this proc in browser. It contains a 16 ms sleep on web!
 		if raylib.WindowShouldClose() {
 			run = false
 		}

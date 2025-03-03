@@ -17,4 +17,5 @@ Entity :: struct {
 	gravity:          Maybe(component.Gravity),
 	is_player:        Maybe(component.Is_Player),
 	animation_frames: Maybe(component.Animation_Frames),
+	respawn:          Maybe(component.Respawn),
 }
