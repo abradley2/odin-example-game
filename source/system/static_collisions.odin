@@ -55,6 +55,7 @@ run_static_collisions_system :: proc(
 						collision_box.did_touch = collision_box.did_touch | {.Floor}
 					}
 					velocity[1] = 0
+					// continue
 				}
 
 
@@ -64,7 +65,7 @@ run_static_collisions_system :: proc(
 					collision_box.did_touch = collision_box.did_touch | {.Wall}
 					position[0] = box.position.x + box.w
 					velocity[0] = 0
-					continue
+					// continue
 				}
 
 				is_right_wall_collision :=
@@ -73,7 +74,7 @@ run_static_collisions_system :: proc(
 					collision_box.did_touch = collision_box.did_touch | {.Wall}
 					position[0] = box.position.x - collision_box.size.x
 					velocity[0] = 0
-					continue
+					// continue
 				}
 			}
 		}

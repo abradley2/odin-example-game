@@ -121,7 +121,6 @@ update :: proc() {
 	system.run_camera_follow_system(&camera, &parallax_camera, w.is_player[:], w.position[:])
 	system.run_respawn_system(w.respawn[:], w.position[:])
 
-
 	raylib.BeginDrawing()
 	raylib.ClearBackground({194, 227, 232, 255})
 
