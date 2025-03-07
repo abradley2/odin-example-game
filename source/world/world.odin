@@ -1,5 +1,4 @@
 package world
 
-import "../entity"
 
-World :: #soa[entity.POOL_SIZE]entity.Entity
+World :: #soa[POOL_SIZE]Entity

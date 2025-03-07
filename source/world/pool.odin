@@ -1,6 +1,7 @@
-package entity
+package world
 
 import "../component"
+import "vendor:raylib"
 
 POOL_SIZE :: 4_096
 
@@ -12,6 +13,33 @@ Pool :: struct {
 	renderables:      [POOL_SIZE]int,
 	sprite_vectors:   [POOL_SIZE][dynamic]component.Sprite,
 	animation_frames: [POOL_SIZE][dynamic]component.Animation_Frame,
+}
+
+bubble_sort_renderables :: proc(
+	pool: ^Pool,
+	positions: []Maybe(component.Position),
+	max_idx: int,
+) -> (
+	next_max_idx: int,
+) {
+	work_done: int
+	for i in 0 ..< max_idx {
+		for j in 0 ..< max_idx - i - 1 {
+			i_val := positions[pool.renderables[j]].? or_else raylib.Vector3{0, 0, 0}
+			j_val := positions[pool.renderables[j]].? or_else raylib.Vector3{0, 0, 0}
+			if j_val.z < i_val.z {
+				pool.renderables[j], pool.renderables[j + 1] =
+					pool.renderables[j + 1], pool.renderables[j]
+			}
+			work_done = work_done + 1
+			if work_done >= 4096 * 4 {
+				next_max_idx = i
+				return
+			}
+		}
+	}
+
+	return
 }
 
 free_pool :: proc(pool: ^Pool) {

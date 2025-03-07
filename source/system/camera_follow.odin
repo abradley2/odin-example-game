@@ -25,8 +25,8 @@ run_camera_follow_system :: proc(
 		paralax_target :=
 			camera.target +
 			raylib.Vector2 {
-					(next_target.x - camera.target.x) * 0.50,
-					(next_target.y - camera.target.y) * 0.50,
+					(next_target.x - camera.target.x) * 0.75,
+					(next_target.y - camera.target.y) * 0.75,
 				}
 
 

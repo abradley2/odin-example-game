@@ -2,4 +2,4 @@ package component
 
 import "vendor:raylib"
 
-Position :: raylib.Vector2
+Position :: raylib.Vector3

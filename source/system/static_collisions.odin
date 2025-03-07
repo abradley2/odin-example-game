@@ -1,32 +1,34 @@
 package system
 
 import "../component"
-import "../quadtree"
+import "../world"
+import "vendor:raylib"
 
 run_static_collisions_system :: proc(
 	dt: f32,
-	static_collisions: ^quadtree.Quad_Tree,
+	static_collisions: ^world.Quad_Tree,
 	position_components: []Maybe(component.Position),
 	velocity_components: []Maybe(component.Velocity),
 	collision_box_components: []Maybe(component.Collision_Box),
 ) {
-	nearby_boxes, _ := make([dynamic]quadtree.Box, 0, 64, context.temp_allocator)
+	nearby_boxes, _ := make([dynamic]world.Box, 0, 64, context.temp_allocator)
 
 	for i in 0 ..< len(position_components) {
 		_position := (&position_components[i].?) or_continue
 		velocity := (&velocity_components[i].?) or_continue
 		collision_box := (&collision_box_components[i].?) or_continue
 
-		position := _position^ + collision_box.offset
+		position := _position^ + raylib.Vector3{collision_box.offset.x, collision_box.offset.y, 0}
 
-		next_position := position + (velocity^ * dt)
-		next_collision_box := quadtree.Box {
-			position = next_position + collision_box.offset,
+		adjusted_velocity := raylib.Vector2{velocity.x * dt, velocity.y * dt}
+		next_position := position + raylib.Vector3{adjusted_velocity.x, adjusted_velocity.y, 0}
+		next_collision_box := world.Box {
+			position = raylib.Vector2{next_position.x, next_position.y} + collision_box.offset,
 			w        = collision_box.size.x,
 			h        = collision_box.size.y,
 		}
 
-		quadtree.query_nearby_boxes(static_collisions, &nearby_boxes, next_collision_box)
+		world.query_nearby_boxes(static_collisions, &nearby_boxes, next_collision_box)
 
 		collision_box.did_touch = {}
 

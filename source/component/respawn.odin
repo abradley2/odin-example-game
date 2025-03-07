@@ -2,4 +2,4 @@ package component
 
 import "vendor:raylib"
 
-Respawn :: raylib.Vector2
+Respawn :: raylib.Vector3

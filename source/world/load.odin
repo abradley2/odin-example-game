@@ -1,9 +1,7 @@
 package world
 
 import "../component"
-import "../entity"
 import "../platform"
-import "../quadtree"
 import "../texture"
 import "../tiled"
 import "core:container/small_array"
@@ -15,13 +13,13 @@ import "vendor:raylib"
 load_world :: proc(
 	map_id: tiled.Map_Id,
 	w: ^World,
-	entity_pool: ^entity.Pool,
+	entity_pool: ^Pool,
 ) -> (
-	static_collisions: ^quadtree.Quad_Tree,
+	static_collisions: ^Quad_Tree,
 	ok: bool,
 ) {
-	static_collisions = new(quadtree.Quad_Tree)
-	static_collisions^ = quadtree.new_quad_tree(1152)
+	static_collisions = new(Quad_Tree)
+	static_collisions^ = new_quad_tree(1152)
 	context.allocator = context.temp_allocator
 	ok = _load_world(map_id, w, entity_pool, static_collisions)
 	return
@@ -30,8 +28,8 @@ load_world :: proc(
 _load_world :: proc(
 	map_id: tiled.Map_Id,
 	w: ^World,
-	entity_pool: ^entity.Pool,
-	static_collisions: ^quadtree.Quad_Tree,
+	entity_pool: ^Pool,
+	static_collisions: ^Quad_Tree,
 ) -> (
 	ok: bool,
 ) {
@@ -115,19 +113,16 @@ _load_world :: proc(
 
 _populate_world :: proc(
 	w: ^World,
-	entity_pool: ^entity.Pool,
-	static_collisions: ^quadtree.Quad_Tree,
+	entity_pool: ^Pool,
+	static_collisions: ^Quad_Tree,
 	tile_map: ^tiled.Tile_Map,
 	tile_sets: [dynamic]tiled.Tile_Set,
 ) {
 
 	for tile_layer, layer_idx in small_array.slice(&tile_map.layers) {
-		layer_entity_ref := entity.alloc_entity(entity_pool, true)
+		layer_entity_ref := alloc_entity(entity_pool, true)
 
-		layer_entity_sprite_vector := entity.alloc_sprite_vector(
-			entity_pool,
-			layer_entity_ref.local_id,
-		)
+		layer_entity_sprite_vector := alloc_sprite_vector(entity_pool, layer_entity_ref.local_id)
 
 		sprite_group := component.Sprite_Group {
 			sprites = layer_entity_sprite_vector,
@@ -135,7 +130,7 @@ _populate_world :: proc(
 
 		w.sprite_group[layer_entity_ref.local_id] = sprite_group
 
-		layer_position := component.Position{0, 0}
+		layer_position := component.Position{0, 0, f32(layer_idx)}
 
 		w.position[layer_entity_ref.local_id] = layer_position
 
@@ -190,7 +185,7 @@ _populate_world :: proc(
 				w,
 				small_array.slice(&properties),
 				entity_pool,
-				layer_position + dst_offset,
+				layer_position + raylib.Vector3{dst_offset[0], dst_offset[1], 0},
 			)
 
 			_ = layer_idx
@@ -198,12 +193,15 @@ _populate_world :: proc(
 			for custom_property in small_array.slice(&properties) {
 				#partial switch property in custom_property {
 				case tiled.Collision_Box:
-					static_collision_box := quadtree.Box {
-						position = layer_position + dst_offset,
+					static_collision_box := Box {
+						position = raylib.Vector2 {
+							layer_position[0],
+							layer_position[1],
+						} + raylib.Vector2{dst_offset[0], dst_offset[1]},
 						w        = sprite.dst_width,
 						h        = sprite.dst_height,
 					}
-					quadtree.insert_into_quad_tree(static_collisions, static_collision_box)
+					insert_into_quad_tree(static_collisions, static_collision_box)
 				}
 			}
 
