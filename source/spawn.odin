@@ -8,7 +8,7 @@ import "vendor:raylib"
 
 // GUIDE: spawn entities in response to special tiles on the map
 check_spawn :: proc(
-	w: ^World,
+	world: ^World,
 	custom_properties: []tiled.Custom_Property,
 	entity_pool: ^entity.Pool,
 	position: raylib.Vector3,
@@ -23,24 +23,24 @@ check_spawn :: proc(
 				player_entity_ref.local_id,
 			)
 
-			w.animation_frames[player_entity_ref.local_id] = component.make_animation(
+			world.animation_frames[player_entity_ref.local_id] = component.make_animation(
 				component.Animation_Id.Player_Walk,
 				animation_frames,
 			)
 
-			w.is_player[player_entity_ref.local_id] = component.Is_Player{}
+			world.is_player[player_entity_ref.local_id] = component.Is_Player{}
 
-			w.position[player_entity_ref.local_id] = position + raylib.Vector3{0, -16, 0}
-			w.respawn[player_entity_ref.local_id] = position + raylib.Vector3{0, -16, 0}
+			world.position[player_entity_ref.local_id] = position + raylib.Vector3{0, -16, 0}
+			world.respawn[player_entity_ref.local_id] = position + raylib.Vector3{0, -16, 0}
 
-			w.gravity[player_entity_ref.local_id] = component.Gravity{}
+			world.gravity[player_entity_ref.local_id] = component.Gravity{}
 
-			w.velocity[player_entity_ref.local_id] = raylib.Vector2{0, 0}
-			w.collision_box[player_entity_ref.local_id] = component.Collision_Box {
+			world.velocity[player_entity_ref.local_id] = raylib.Vector2{0, 0}
+			world.collision_box[player_entity_ref.local_id] = component.Collision_Box {
 				offset = raylib.Vector2{6, 4},
 				size   = raylib.Vector2{12, 20},
 			}
-			w.sprite[player_entity_ref.local_id] = component.Sprite {
+			world.sprite[player_entity_ref.local_id] = component.Sprite {
 				texture_id = texture.Texture_Id.Characters_Packed,
 				src_rect   = raylib.Rectangle{0, 0, 24, 24},
 				dst_offset = {0, 0},
