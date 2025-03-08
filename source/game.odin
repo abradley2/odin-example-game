@@ -8,6 +8,7 @@ import "./system"
 import "./texture"
 import "./tiled"
 import "core:c"
+import "core:fmt"
 import "vendor:raylib"
 
 
@@ -103,6 +104,10 @@ update :: proc() {
 
 	controls := controls.run_keyboard_inputs()
 	delta := raylib.GetFrameTime() / 0.01666
+	fmt.printf("delta: %f\n", delta)
+	if delta > 2 {
+		delta = 2
+	}
 
 	system.run_gravity_system(delta, w.gravity[:], w.velocity[:])
 	system.run_static_collisions_system(
