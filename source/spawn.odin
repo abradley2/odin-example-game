@@ -1,8 +1,8 @@
-package world
+package game
 
-import "../component"
-import "../texture"
-import "../tiled"
+import "./component"
+import "./texture"
+import "./tiled"
 import "vendor:raylib"
 
 // GUIDE: spawn entities in response to special tiles on the map

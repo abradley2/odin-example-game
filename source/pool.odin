@@ -1,6 +1,6 @@
-package world
+package game
 
-import "../component"
+import "./component"
 import "vendor:raylib"
 
 POOL_SIZE :: 4_096
@@ -24,12 +24,12 @@ bubble_sort_renderables :: proc(
 ) {
 	work_done: int
 	for i in 0 ..< max_idx {
-		for j in 0 ..< max_idx - i - 1 {
-			i_val := positions[pool.renderables[j]].? or_else raylib.Vector3{0, 0, 0}
-			j_val := positions[pool.renderables[j]].? or_else raylib.Vector3{0, 0, 0}
-			if j_val.z < i_val.z {
-				pool.renderables[j], pool.renderables[j + 1] =
-					pool.renderables[j + 1], pool.renderables[j]
+		for j in 1 ..< max_idx - i - 1 {
+			l_val := positions[pool.renderables[j - 1]].? or_else raylib.Vector3{0, 0, 0}
+			r_val := positions[pool.renderables[j]].? or_else raylib.Vector3{0, 0, 0}
+			if l_val.z > r_val.z {
+				pool.renderables[j - 1], pool.renderables[j] =
+					pool.renderables[j], pool.renderables[j - 1]
 			}
 			work_done = work_done + 1
 			if work_done >= 4096 * 4 {

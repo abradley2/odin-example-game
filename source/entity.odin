@@ -1,6 +1,6 @@
-package world
+package game
 
-import "../component"
+import "./component"
 
 EntityRef :: struct {
 	local_id:  int,

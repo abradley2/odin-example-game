@@ -1,6 +1,6 @@
-package world
+package game
 
-import "../tiled"
+import "./tiled"
 import "core:log"
 import "core:testing"
 

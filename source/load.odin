@@ -1,9 +1,10 @@
-package world
+package game
 
-import "../component"
-import "../platform"
-import "../texture"
-import "../tiled"
+import "./component"
+import "./platform"
+import "./quadtree"
+import "./texture"
+import "./tiled"
 import "core:container/small_array"
 import "core:log"
 import "core:path/slashpath"
@@ -15,11 +16,11 @@ load_world :: proc(
 	w: ^World,
 	entity_pool: ^Pool,
 ) -> (
-	static_collisions: ^Quad_Tree,
+	static_collisions: ^quadtree.Quad_Tree,
 	ok: bool,
 ) {
-	static_collisions = new(Quad_Tree)
-	static_collisions^ = new_quad_tree(1152)
+	static_collisions = new(quadtree.Quad_Tree)
+	static_collisions^ = quadtree.new_quad_tree(1152)
 	context.allocator = context.temp_allocator
 	ok = _load_world(map_id, w, entity_pool, static_collisions)
 	return
@@ -29,7 +30,7 @@ _load_world :: proc(
 	map_id: tiled.Map_Id,
 	w: ^World,
 	entity_pool: ^Pool,
-	static_collisions: ^Quad_Tree,
+	static_collisions: ^quadtree.Quad_Tree,
 ) -> (
 	ok: bool,
 ) {
@@ -114,10 +115,39 @@ _load_world :: proc(
 _populate_world :: proc(
 	w: ^World,
 	entity_pool: ^Pool,
-	static_collisions: ^Quad_Tree,
+	static_collisions: ^quadtree.Quad_Tree,
 	tile_map: ^tiled.Tile_Map,
 	tile_sets: [dynamic]tiled.Tile_Set,
 ) {
+	select_arrow_id := alloc_entity(entity_pool, true)
+	w.position[select_arrow_id.local_id] = component.Position{0, 0, 8}
+	w.sprite[select_arrow_id.local_id] = component.Sprite {
+		texture_id = texture.Texture_Id.UI_Arrow_Basic_Blue,
+		src_rect   = raylib.Rectangle{0, 0, 0, 0},
+		dst_offset = raylib.Vector2{-18, (24 / 2) - 6},
+		dst_width  = 12,
+		dst_height = 12,
+	}
+
+	select_foo_id := alloc_entity(entity_pool, true)
+	w.position[select_foo_id.local_id] = component.Position{0, 0, 9}
+	w.sprite[select_foo_id.local_id] = component.Sprite {
+		texture_id = texture.Texture_Id.UI_Button_Blue,
+		src_rect   = raylib.Rectangle{0, 0, 0, 0},
+		dst_offset = raylib.Vector2{0, 0},
+		dst_width  = 64,
+		dst_height = 24,
+	}
+
+	select_bar_id := alloc_entity(entity_pool, true)
+	w.position[select_bar_id.local_id] = component.Position{0, 0, 7}
+	w.sprite[select_bar_id.local_id] = component.Sprite {
+		texture_id = texture.Texture_Id.UI_Button_Blue,
+		src_rect   = raylib.Rectangle{0, 0, 0, 0},
+		dst_offset = raylib.Vector2{0, 64},
+		dst_width  = 64,
+		dst_height = 24,
+	}
 
 	for tile_layer, layer_idx in small_array.slice(&tile_map.layers) {
 		layer_entity_ref := alloc_entity(entity_pool, true)
@@ -193,7 +223,7 @@ _populate_world :: proc(
 			for custom_property in small_array.slice(&properties) {
 				#partial switch property in custom_property {
 				case tiled.Collision_Box:
-					static_collision_box := Box {
+					static_collision_box := quadtree.Box {
 						position = raylib.Vector2 {
 							layer_position[0],
 							layer_position[1],
@@ -201,7 +231,7 @@ _populate_world :: proc(
 						w        = sprite.dst_width,
 						h        = sprite.dst_height,
 					}
-					insert_into_quad_tree(static_collisions, static_collision_box)
+					quadtree.insert_into_quad_tree(static_collisions, static_collision_box)
 				}
 			}
 

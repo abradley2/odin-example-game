@@ -1,4 +1,4 @@
-package world
+package quadtree
 
 import "core:log"
 import "core:testing"

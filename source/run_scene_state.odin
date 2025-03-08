@@ -1,12 +1,13 @@
-package world
+package game
 
-import "../tiled"
+import "./quadtree"
+import "./tiled"
 
 Scene_Error :: struct {}
 
 Scene_Loaded :: struct {
 	map_id:            tiled.Map_Id,
-	static_collisions: ^Quad_Tree,
+	static_collisions: ^quadtree.Quad_Tree,
 }
 
 Scene_State :: union {
@@ -24,7 +25,7 @@ run_scene_state :: proc(
 
 	if !has_map_id {
 		if s, scene_loaded := state.(Scene_Loaded); scene_loaded {
-			free_quad_tree(s.static_collisions)
+			quadtree.free_quad_tree(s.static_collisions)
 			free(s.static_collisions)
 		}
 		return
@@ -43,7 +44,7 @@ run_scene_state :: proc(
 		free_all(context.temp_allocator)
 	case Scene_Loaded:
 		if v.map_id != map_id {
-			free_quad_tree(v.static_collisions)
+			quadtree.free_quad_tree(v.static_collisions)
 			free(v.static_collisions)
 
 			if world_static_collisions, ok := load_world(v.map_id, w, entity_pool); ok {

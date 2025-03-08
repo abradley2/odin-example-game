@@ -3,18 +3,18 @@ package game
 
 import "./component"
 import "./controls"
+import "./quadtree"
 import "./system"
 import "./texture"
 import "./tiled"
-import "./world"
 import "core:c"
 import "vendor:raylib"
 
 
 run: bool
 
-w: world.World
-entity_pool: ^world.Pool
+w: World
+entity_pool: ^Pool
 
 tile_map_packed_texture: raylib.Texture
 tile_map_backgrounds_packed_texture: raylib.Texture
@@ -36,7 +36,7 @@ init :: proc() {
 	raylib.SetConfigFlags({.WINDOW_RESIZABLE, .VSYNC_HINT})
 	raylib.InitWindow(1280, 720, "Odin + Raylib on the web")
 
-	entity_pool = world.new_pool(context.allocator)
+	entity_pool = new_pool(context.allocator)
 
 	raylib.SetTargetFPS(61)
 
@@ -57,16 +57,16 @@ init :: proc() {
 
 // GUIDE: editing this variable will cause the map to change
 set_current_map_id: tiled.Map_Id = tiled.Map_Id.Level01
-scene_state: world.Scene_State = nil
+scene_state: Scene_State = nil
 
 z_sort_idx: int
 update :: proc() {
 	if z_sort_idx == 0 {
-		z_sort_idx = world.POOL_SIZE
+		z_sort_idx = POOL_SIZE
 	}
-	z_sort_idx = world.bubble_sort_renderables(entity_pool, w.position[:], z_sort_idx)
+	z_sort_idx = bubble_sort_renderables(entity_pool, w.position[:], z_sort_idx)
 
-	world.run_scene_state(&scene_state, &w, entity_pool, set_current_map_id)
+	run_scene_state(&scene_state, &w, entity_pool, set_current_map_id)
 
 	parallax_camera := raylib.Camera2D {
 		offset   = raylib.Vector2{0, 0},
@@ -96,7 +96,7 @@ update :: proc() {
 	camera.zoom = zoom
 	parallax_camera.zoom = zoom
 
-	loaded_scene, scene_is_loaded := scene_state.(world.Scene_Loaded)
+	loaded_scene, scene_is_loaded := scene_state.(Scene_Loaded)
 	if !scene_is_loaded {
 		return
 	}
@@ -212,6 +212,14 @@ render_sprite :: proc(position: raylib.Vector3, sprite: component.Sprite) -> (di
 		height = sprite.src_rect.height,
 	}
 
+	if src_rect.width < 1 {
+		src_rect.width = f32(texture.width)
+	}
+
+	if src_rect.height < 1 {
+		src_rect.height = f32(texture.height)
+	}
+
 	if sprite.flipped {
 		src_rect.width *= -1
 	}
@@ -227,10 +235,10 @@ parent_window_size_changed :: proc(w, h: int) {
 
 shutdown :: proc() {
 	switch v in scene_state {
-	case world.Scene_Loaded:
-		world.free_quad_tree(v.static_collisions)
+	case Scene_Loaded:
+		quadtree.free_quad_tree(v.static_collisions)
 		free(v.static_collisions)
-	case nil, world.Scene_Error:
+	case nil, Scene_Error:
 	}
 	raylib.CloseWindow()
 }

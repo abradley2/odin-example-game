@@ -1,6 +1,7 @@
-package world
+package game
 
-import "../tiled"
+import "./quadtree"
+import "./tiled"
 import "core:reflect"
 import "core:testing"
 
@@ -18,7 +19,7 @@ _load_map_test :: proc(t: ^testing.T) {
 		static_collisions, ok := load_world(tile_map_id, w, entity_pool)
 		testing.expect(t, ok)
 		free_all(context.temp_allocator)
-		free_quad_tree(static_collisions)
+		quadtree.free_quad_tree(static_collisions)
 		free(static_collisions)
 	}
 
