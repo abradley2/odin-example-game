@@ -1,6 +1,7 @@
 package entity
 
 import "../component"
+import "core:fmt"
 import "vendor:raylib"
 
 POOL_SIZE :: 4_096
@@ -32,8 +33,8 @@ bubble_sort_renderables :: proc(
 					pool.renderables[j], pool.renderables[j - 1]
 			}
 			work_done = work_done + 1
-			if work_done >= 4096 * 4 {
-				next_max_idx = i
+			if work_done >= 4096 * 24 {
+				next_max_idx = max_idx - i
 				return
 			}
 		}
