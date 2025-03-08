@@ -1,6 +1,6 @@
-package game
+package entity
 
-import "./component"
+import "../component"
 import "vendor:raylib"
 
 POOL_SIZE :: 4_096

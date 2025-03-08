@@ -3,6 +3,7 @@ package game
 
 import "./component"
 import "./controls"
+import "./entity"
 import "./quadtree"
 import "./system"
 import "./texture"
@@ -13,8 +14,10 @@ import "vendor:raylib"
 
 run: bool
 
-w: World
-entity_pool: ^Pool
+World :: #soa[entity.POOL_SIZE]entity.Entity
+
+_world: World
+entity_pool: ^entity.Pool
 
 tile_map_packed_texture: raylib.Texture
 tile_map_backgrounds_packed_texture: raylib.Texture
@@ -36,7 +39,7 @@ init :: proc() {
 	raylib.SetConfigFlags({.WINDOW_RESIZABLE, .VSYNC_HINT})
 	raylib.InitWindow(1280, 720, "Odin + Raylib on the web")
 
-	entity_pool = new_pool(context.allocator)
+	entity_pool = entity.new_pool(context.allocator)
 
 	raylib.SetTargetFPS(61)
 
@@ -71,7 +74,7 @@ Scene_State :: union {
 run_scene_state :: proc(
 	state: ^Scene_State,
 	w: ^World,
-	entity_pool: ^Pool,
+	entity_pool: ^entity.Pool,
 	target_map_id: Maybe(tiled.Map_Id),
 ) {
 	map_id, has_map_id := target_map_id.?
@@ -119,12 +122,14 @@ scene_state: Scene_State = nil
 
 z_sort_idx: int
 update :: proc() {
-	if z_sort_idx == 0 {
-		z_sort_idx = POOL_SIZE
-	}
-	z_sort_idx = bubble_sort_renderables(entity_pool, w.position[:], z_sort_idx)
+	world := &_world
 
-	run_scene_state(&scene_state, &w, entity_pool, set_current_map_id)
+	if z_sort_idx == 0 {
+		z_sort_idx = entity.POOL_SIZE
+	}
+	z_sort_idx = entity.bubble_sort_renderables(entity_pool, world.position[:], z_sort_idx)
+
+	run_scene_state(&scene_state, world, entity_pool, set_current_map_id)
 
 	parallax_camera := raylib.Camera2D {
 		offset   = raylib.Vector2{0, 0},
@@ -166,25 +171,30 @@ update :: proc() {
 		delta = 2
 	}
 
-	system.run_gravity_system(delta, w.gravity[:], w.velocity[:])
+	system.run_gravity_system(delta, world.gravity[:], world.velocity[:])
 	system.run_static_collisions_system(
 		delta,
 		loaded_scene.static_collisions,
-		w.position[:],
-		w.velocity[:],
-		w.collision_box[:],
+		world.position[:],
+		world.velocity[:],
+		world.collision_box[:],
 	)
-	system.run_velocity_system(delta, w.velocity[:], w.position[:])
+	system.run_velocity_system(delta, world.velocity[:], world.position[:])
 	system.run_player_controls_system(
 		controls,
-		w.sprite[:],
-		w.velocity[:],
-		w.is_player[:],
-		w.collision_box[:],
+		world.sprite[:],
+		world.velocity[:],
+		world.is_player[:],
+		world.collision_box[:],
 	)
-	system.run_animation_system(delta, w.sprite[:], w.animation_frames[:])
-	system.run_camera_follow_system(&camera, &parallax_camera, w.is_player[:], w.position[:])
-	system.run_respawn_system(w.respawn[:], w.position[:])
+	system.run_animation_system(delta, world.sprite[:], world.animation_frames[:])
+	system.run_camera_follow_system(
+		&camera,
+		&parallax_camera,
+		world.is_player[:],
+		world.position[:],
+	)
+	system.run_respawn_system(world.respawn[:], world.position[:])
 
 	raylib.BeginDrawing()
 	raylib.ClearBackground({194, 227, 232, 255})
@@ -216,9 +226,9 @@ update :: proc() {
 
 	{
 		for entity_id in entity_pool.renderables {
-			position := w.position[entity_id].? or_continue
-			sprite, has_sprite := w.sprite[entity_id].?
-			sprite_group, has_sprite_group := w.sprite_group[entity_id].?
+			position := world.position[entity_id].? or_continue
+			sprite, has_sprite := world.sprite[entity_id].?
+			sprite_group, has_sprite_group := world.sprite_group[entity_id].?
 
 			if has_sprite_group {
 				for sprite_group_sprite in sprite_group.sprites {

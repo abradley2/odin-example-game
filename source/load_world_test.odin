@@ -1,5 +1,6 @@
 package game
 
+import "./entity"
 import "./quadtree"
 import "./tiled"
 import "core:reflect"
@@ -9,7 +10,7 @@ import "core:testing"
 _load_map_test :: proc(t: ^testing.T) {
 	tile_map_ids := reflect.enum_field_names(tiled.Map_Id)
 
-	entity_pool := new_pool(context.allocator)
+	entity_pool := entity.new_pool(context.allocator)
 
 	for id in tile_map_ids {
 		w := new(World)
@@ -23,5 +24,5 @@ _load_map_test :: proc(t: ^testing.T) {
 		free(static_collisions)
 	}
 
-	free_pool(entity_pool)
+	entity.free_pool(entity_pool)
 }

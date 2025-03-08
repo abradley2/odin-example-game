@@ -1,6 +1,7 @@
 package game
 
 import "./component"
+import "./entity"
 import "./texture"
 import "./tiled"
 import "vendor:raylib"
@@ -9,15 +10,18 @@ import "vendor:raylib"
 check_spawn :: proc(
 	w: ^World,
 	custom_properties: []tiled.Custom_Property,
-	entity_pool: ^Pool,
+	entity_pool: ^entity.Pool,
 	position: raylib.Vector3,
 ) {
 	for custom_property in custom_properties {
 		#partial switch property in custom_property {
 		case tiled.Player_Spawn:
-			player_entity_ref := alloc_entity(entity_pool, true)
+			player_entity_ref := entity.alloc_entity(entity_pool, true)
 
-			animation_frames := alloc_animation_frames(entity_pool, player_entity_ref.local_id)
+			animation_frames := entity.alloc_animation_frames(
+				entity_pool,
+				player_entity_ref.local_id,
+			)
 
 			w.animation_frames[player_entity_ref.local_id] = component.make_animation(
 				component.Animation_Id.Player_Walk,

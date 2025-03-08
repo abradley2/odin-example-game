@@ -1,6 +1,7 @@
 package game
 
 import "./component"
+import "./entity"
 import "./platform"
 import "./quadtree"
 import "./texture"
@@ -13,8 +14,8 @@ import "vendor:raylib"
 
 load_world :: proc(
 	map_id: tiled.Map_Id,
-	w: ^World,
-	entity_pool: ^Pool,
+	world: ^World,
+	entity_pool: ^entity.Pool,
 ) -> (
 	static_collisions: ^quadtree.Quad_Tree,
 	ok: bool,
@@ -22,14 +23,14 @@ load_world :: proc(
 	static_collisions = new(quadtree.Quad_Tree)
 	static_collisions^ = quadtree.new_quad_tree(1152)
 	context.allocator = context.temp_allocator
-	ok = _load_world(map_id, w, entity_pool, static_collisions)
+	ok = _load_world(map_id, world, entity_pool, static_collisions)
 	return
 }
 
 _load_world :: proc(
 	map_id: tiled.Map_Id,
-	w: ^World,
-	entity_pool: ^Pool,
+	world: ^World,
+	entity_pool: ^entity.Pool,
 	static_collisions: ^quadtree.Quad_Tree,
 ) -> (
 	ok: bool,
@@ -106,22 +107,22 @@ _load_world :: proc(
 	}
 
 	// POPULATE WORLD
-	_populate_world(w, entity_pool, static_collisions, tile_map, tile_sets)
+	_populate_world(world, entity_pool, static_collisions, tile_map, tile_sets)
 
 	ok = true
 	return
 }
 
 _populate_world :: proc(
-	w: ^World,
-	entity_pool: ^Pool,
+	world: ^World,
+	entity_pool: ^entity.Pool,
 	static_collisions: ^quadtree.Quad_Tree,
 	tile_map: ^tiled.Tile_Map,
 	tile_sets: [dynamic]tiled.Tile_Set,
 ) {
-	select_arrow_id := alloc_entity(entity_pool, true)
-	w.position[select_arrow_id.local_id] = component.Position{0, 0, 8}
-	w.sprite[select_arrow_id.local_id] = component.Sprite {
+	select_arrow_id := entity.alloc_entity(entity_pool, true)
+	world.position[select_arrow_id.local_id] = component.Position{0, 0, 8}
+	world.sprite[select_arrow_id.local_id] = component.Sprite {
 		texture_id = texture.Texture_Id.UI_Arrow_Basic_Blue,
 		src_rect   = raylib.Rectangle{0, 0, 0, 0},
 		dst_offset = raylib.Vector2{-18, (24 / 2) - 6},
@@ -129,9 +130,9 @@ _populate_world :: proc(
 		dst_height = 12,
 	}
 
-	select_foo_id := alloc_entity(entity_pool, true)
-	w.position[select_foo_id.local_id] = component.Position{0, 0, 9}
-	w.sprite[select_foo_id.local_id] = component.Sprite {
+	select_foo_id := entity.alloc_entity(entity_pool, true)
+	world.position[select_foo_id.local_id] = component.Position{0, 0, 9}
+	world.sprite[select_foo_id.local_id] = component.Sprite {
 		texture_id = texture.Texture_Id.UI_Button_Blue,
 		src_rect   = raylib.Rectangle{0, 0, 0, 0},
 		dst_offset = raylib.Vector2{0, 0},
@@ -139,9 +140,9 @@ _populate_world :: proc(
 		dst_height = 24,
 	}
 
-	select_bar_id := alloc_entity(entity_pool, true)
-	w.position[select_bar_id.local_id] = component.Position{0, 0, 7}
-	w.sprite[select_bar_id.local_id] = component.Sprite {
+	select_bar_id := entity.alloc_entity(entity_pool, true)
+	world.position[select_bar_id.local_id] = component.Position{0, 0, 7}
+	world.sprite[select_bar_id.local_id] = component.Sprite {
 		texture_id = texture.Texture_Id.UI_Button_Blue,
 		src_rect   = raylib.Rectangle{0, 0, 0, 0},
 		dst_offset = raylib.Vector2{0, 64},
@@ -150,19 +151,22 @@ _populate_world :: proc(
 	}
 
 	for tile_layer, layer_idx in small_array.slice(&tile_map.layers) {
-		layer_entity_ref := alloc_entity(entity_pool, true)
+		layer_entity_ref := entity.alloc_entity(entity_pool, true)
 
-		layer_entity_sprite_vector := alloc_sprite_vector(entity_pool, layer_entity_ref.local_id)
+		layer_entity_sprite_vector := entity.alloc_sprite_vector(
+			entity_pool,
+			layer_entity_ref.local_id,
+		)
 
 		sprite_group := component.Sprite_Group {
 			sprites = layer_entity_sprite_vector,
 		}
 
-		w.sprite_group[layer_entity_ref.local_id] = sprite_group
+		world.sprite_group[layer_entity_ref.local_id] = sprite_group
 
 		layer_position := component.Position{0, 0, f32(layer_idx)}
 
-		w.position[layer_entity_ref.local_id] = layer_position
+		world.position[layer_entity_ref.local_id] = layer_position
 
 		for global_id, tile_idx in tile_layer.data {
 			if global_id == 0 {
@@ -212,7 +216,7 @@ _populate_world :: proc(
 			}
 
 			check_spawn(
-				w,
+				world,
 				small_array.slice(&properties),
 				entity_pool,
 				layer_position + raylib.Vector3{dst_offset[0], dst_offset[1], 0},
